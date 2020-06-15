@@ -8,7 +8,8 @@ const socket = io();
 let results = [];
 let requestStart;
 let testStart;
-let chunkSize =  1000000; // 1 KiB
+let startChunkSize = 100000; // 1 KiB
+let chunkSize;
 let junkData;
 
 /* Get server info */ 
@@ -47,6 +48,7 @@ function startPing(){
 function startDownload(){
     downloadElem.innerHTML = '';
     results = [];
+    chunkSize = startChunkSize;
     testStart = Date.now();
     download();
 }
@@ -54,6 +56,7 @@ function startDownload(){
 function startUpload(){
     uploadElem.innerHTML = '';
     results = [];
+    chunkSize = startChunkSize;
     testStart = Date.now();
     upload();
 }
@@ -70,15 +73,15 @@ function download(){
     setTimeout(function() {
         requestStart = Date.now();
         socket.emit('download', chunkSize);   
-    }, 50)
+    }, 10)
 }
 
 function upload(){
     setTimeout(function() {
         let data = randomBytes(chunkSize);
         requestStart = Date.now();
-        socket.emit('upload', junkData);
-    }, 50)
+        socket.emit('upload', data);
+    }, 10)
 }
 
 /* Handle Events */
@@ -99,7 +102,7 @@ socket.on('download', function(data) {
     let elapsed = ( Date.now() - requestStart ) / 1000; //in sec
     let received = data.byteLength * 8 / 1024 / 1024;
     let result = received / elapsed;
-    junkData = data;
+    //junkData = data;
     results.push(result);
     downloadElem.innerHTML = rounded(result) + " Mbit/s";
     if(Date.now() - testStart > 1000 * 10){
@@ -107,6 +110,8 @@ socket.on('download', function(data) {
         downloadElem.innerHTML = rounded(max) + " Mbit/s";
         startUpload();
     }else{
+        chunkSize = calcChunk(result);
+        console.log(chunkSize);
         download();
     }
 })
@@ -123,6 +128,8 @@ socket.on('upload', function() {
         startBtn.style.display = "block";
         startBtn.innerHTML = "RUN AGAIN";
     }else{
+        chunkSize = calcChunk(result);
+        console.log(chunkSize);
         upload();
     }
 })
@@ -132,6 +139,20 @@ function rounded(num){
     return Math.round((num + Number.EPSILON) * 100) / 100
 }
 
-function randomBytes (size) {
-    return new Blob([new ArrayBuffer(size)], {type: 'application/octet-stream'});
+function calcChunk(data){
+    let value = (data * 1024 * 1024 / 8) / 4;
+    return value;
+}
+
+function randomBytes(size) {
+    var str = '';
+    for (var i = 0; i < size; i++) {
+        var randByte = parseInt(Math.random() * 256, 10);
+        randByte = randByte.toString(16);
+        if (randByte.length == 1) {
+            randByte = "0" + randByte;
+        }
+        str += randByte;
+    }
+    return str;
 }
