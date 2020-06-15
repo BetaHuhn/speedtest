@@ -19,13 +19,13 @@
                     <p id="location"></p>
                 </div>
                 <div class="content-row">
-                    <div class="action-wrapper" onclick="ping()">
+                    <div class="action-wrapper" onclick="startPing()">
                         <span>Ping</span>
                     </div>
-                    <div class="action-wrapper" onclick="download()">
+                    <div class="action-wrapper" onclick="startDownload()">
                         <span>Download</span>
                     </div>
-                    <div class="action-wrapper" onclick="upload()">
+                    <div class="action-wrapper" onclick="startUpload()">
                         <span>Upload</span>
                     </div>
                 </div>
@@ -42,6 +42,9 @@
                 </div>
                 <a onclick="startTest()" id="start-button" class="start-button">START TEST</a>
                 <p id="result"></p>
+            </div>
+            <div class="by">
+                <p>Created by <a href="https://github.com/BetaHuhn">BetaHuhn</a></p>
             </div>
         </div>
         <script src="main.js"></script>

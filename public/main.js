@@ -4,15 +4,14 @@ const downloadElem = document.getElementById('download');
 const uploadElem = document.getElementById('upload');
 
 const socket = io();
-let pingTests = [];
-let downLoadTests = [];
-let uploadTests = [];
-let downloadTestStart = 0;
-let uploadTestStart = 0;
-let chunkSize =  1000000; // 1 KiB
 
+let results = [];
+let requestStart;
+let testStart;
+let chunkSize =  1000000; // 1 KiB
 let junkData;
 
+/* Get server info */ 
 async function hello(){
     const options = {
         method: 'GET',
@@ -33,80 +32,94 @@ async function hello(){
 hello();
 
 function startTest(){
-    pingElem.innerHTML = '';
-    downloadElem.innerHTML = '';
-    uploadElem.innerHTML = '';
     startBtn.style.display = "none";
+    startPing();
+}
+
+
+/* Start tests */
+function startPing(){
+    pingElem.innerHTML = '';
+    results = [];
     ping();
 }
 
+function startDownload(){
+    downloadElem.innerHTML = '';
+    results = [];
+    testStart = Date.now();
+    download();
+}
+
+function startUpload(){
+    uploadElem.innerHTML = '';
+    results = [];
+    testStart = Date.now();
+    upload();
+}
+
+
+/* Emit events */
 function ping(){
     setTimeout(function() {
-        console.log("sending ping")
         socket.emit("clientPing", Date.now())     
-    }, 100)  
+    }, 50)  
 }
 
 function download(){
     setTimeout(function() {
-        downloadTestStart = Date.now();
+        requestStart = Date.now();
         socket.emit('download', chunkSize);   
-    }, 100)
+    }, 50)
 }
 
 function upload(){
     setTimeout(function() {
         let data = randomBytes(chunkSize);
-        uploadTestStart = Date.now();
+        requestStart = Date.now();
         socket.emit('upload', junkData);
-    }, 100)
+    }, 50)
 }
 
-/* Web Sockets */
+/* Handle Events */
 socket.on('serverPong', function(data) {
     let latency = Date.now() - data;
     pingElem.innerHTML = latency + " ms";
-    pingTests.push(latency);
-    if (pingTests.length === 20){
-        let result = Math.min.apply(null, pingTests);
-        console.log(pingTests)
+    results.push(latency);
+    if (results.length === 15){
+        let result = Math.min.apply(null, results);
         pingElem.innerHTML = result + " ms";
-        pingTests = [];
-        download();
+        startDownload();
     }else{
         ping();
     }
 });
 
 socket.on('download', function(data) {
-    let elapsed = ( Date.now() - downloadTestStart ) / 1000; //in sec
+    let elapsed = ( Date.now() - requestStart ) / 1000; //in sec
     let received = data.byteLength * 8 / 1024 / 1024;
     let result = received / elapsed;
     junkData = data;
-    downLoadTests.push(result);
+    results.push(result);
     downloadElem.innerHTML = rounded(result) + " Mbit/s";
-    if(downLoadTests.length === 20){
-        let max = Math.max.apply(null, downLoadTests);
-        console.log(downLoadTests)
+    if(Date.now() - testStart > 1000 * 10){
+        let max = Math.max.apply(null, results);
         downloadElem.innerHTML = rounded(max) + " Mbit/s";
-        downLoadTests = [];
-        upload();
+        startUpload();
     }else{
         download();
     }
 })
 
-socket.on('upload', function(time) {
-    let elapsed = ( Date.now() - uploadTestStart ) / 1000; //in sec
+socket.on('upload', function() {
+    let elapsed = ( Date.now() - requestStart ) / 1000; //in sec
     let sent = chunkSize * 8 / 1024 / 1024;
     let result = sent / elapsed;
-    uploadTests.push(result);
+    results.push(result);
     uploadElem.innerHTML = rounded(result) + " Mbit/s";
-    if(uploadTests.length === 20){
-        let max = Math.max.apply(null, uploadTests);
-        console.log(uploadTests)
+    if(Date.now() - testStart > 1000 * 10){
+        let max = Math.max.apply(null, results);
         uploadElem.innerHTML = rounded(max) + " Mbit/s";
-        uploadTests = [];
         startBtn.style.display = "block";
         startBtn.innerHTML = "RUN AGAIN";
     }else{
@@ -114,6 +127,7 @@ socket.on('upload', function(time) {
     }
 })
 
+/* Helpers */
 function rounded(num){
     return Math.round((num + Number.EPSILON) * 100) / 100
 }

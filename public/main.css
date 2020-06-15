@@ -1,3 +1,11 @@
+:root{
+    --primary: #45e3be;
+    --primary-hover: #4becc7;
+    --background: #241A3C;
+    --background-light: #362f62;
+    --font: #fff;
+}
+
 html,
 body{
     margin: 0;
@@ -8,8 +16,8 @@ body{
 }
 
 #app{
-    background-color: #241A3C;
-    color: #fff;
+    background-color: var(--background);
+    color: var(--font);
     width: 100%;
     height: 100%;
 }
@@ -30,7 +38,7 @@ h1{
 }
 
 .info{
-    color: #45e3be;
+    color: var(--primary);
     display: flex;
     justify-content: space-evenly;
 }
@@ -46,8 +54,8 @@ h1{
 }
 
 .action-wrapper{
-    background-color: #362f62;
-    border: 1px solid #2b2650;
+    background-color: var(--background-light);
+    border: 1px solid var(--background);
     padding: 10px 10px;
     cursor: pointer;
     width: 100%;
@@ -60,7 +68,7 @@ h1{
 }
 
 .start-button{
-    background-color: #45e3be;
+    background-color: var(--primary);
     border-radius: 10px;
     padding: 10px 10px;
     cursor: pointer;
@@ -70,7 +78,24 @@ h1{
 }
 
 .start-button:hover{
-    background-color: #4becc7;
+    background-color: var(--primary-hover);
+}
+
+.by{
+    text-align: center;
+    position: fixed;
+    bottom: 20px;
+    left: 2rem;
+}
+
+.by a{
+    text-decoration: none;
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.by a:hover{
+    color: var(--primary-hover);
 }
 
 
