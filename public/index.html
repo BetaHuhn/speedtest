@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Speedtest</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="main.css">
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="https://kit.fontawesome.com/ca8ffbc206.js" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <div id="app">
+            <div id="content-wrapper">
+                <h1>Speedtest</h1>
+                <div class="info">
+                    <p id="name"></p>
+                    <p id="location"></p>
+                </div>
+                <div class="content-row">
+                    <div class="action-wrapper" onclick="ping()">
+                        <span>Ping</span>
+                    </div>
+                    <div class="action-wrapper" onclick="download()">
+                        <span>Download</span>
+                    </div>
+                    <div class="action-wrapper" onclick="upload()">
+                        <span>Upload</span>
+                    </div>
+                </div>
+                <div class="content-row">
+                    <div class="result-wrapper">
+                        <span id="ping"></span>
+                    </div>
+                    <div class="result-wrapper">
+                        <span id="download"></span>
+                    </div>
+                    <div class="result-wrapper">
+                        <span id="upload"></span>
+                    </div>
+                </div>
+                <a onclick="startTest()" id="start-button" class="start-button">START TEST</a>
+                <p id="result"></p>
+            </div>
+        </div>
+        <script src="main.js"></script>
+    </body>
+</html>
