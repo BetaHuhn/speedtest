@@ -4,7 +4,9 @@
   "description": "Node.js speedtest",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "watch": "nodemon index.js",
+    "start": "node index.js",
+    "pm2": "sudo pm2 start index.js --name speedtest"
   },
   "repository": {
     "type": "git",
